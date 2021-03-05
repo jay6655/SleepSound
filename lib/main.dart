@@ -114,4 +114,37 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  Widget _buildBody() {
+    return new Container(
+        constraints: new BoxConstraints.expand(
+          height: 200.0,
+        ),
+        padding: new EdgeInsets.only(left: 16.0, bottom: 8.0, right: 16.0),
+        decoration: new BoxDecoration(
+          image: new DecorationImage(
+            image: new AssetImage('assets/image.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: new Stack(
+          children: <Widget>[
+            new Positioned(
+              left: 0.0,
+              bottom: 0.0,
+              child: new Text('Title',
+                  style: new TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                  )
+              ),
+            ),
+            new Positioned(
+              right: 0.0,
+              bottom: 0.0,
+              child: new Icon(Icons.star),
+            ),
+          ],
+        )
+    );
 }
