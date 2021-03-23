@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -50,101 +53,202 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  List<String> assertImage = new List<String>();
+  List<String> soundType = new List<String>();
 
+  
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
+    assertImage.add('assets/images/leaves.jpg');
+    assertImage.add('assets/images/rain.jpg');
+    assertImage.add('assets/images/strone.jpg');
+
+    soundType.add('Leaves');
+    soundType.add('Rain');
+    soundType.add('Strone');
+
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body: GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(20),
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 2,
+        children: List.generate(3 , (index) {
+          return new GestureDetector(
+            onTap : (){ pressButton(index); },
+            child: Container(
+              constraints: new BoxConstraints.expand(
+                height: 200.0,
+              ),
+              padding: new EdgeInsets.only(left: 16.0, bottom: 8.0, right: 16.0),
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  image: new AssetImage(assertImage[index]),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            child: new Stack(
+              children: <Widget>[
+                new Positioned(
+                  left: 0.0,
+                  bottom: 0.0,
+                  child: new Text(soundType[index],
+                    style: new TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    )
+                    ),
+                    ),
+                    new Positioned(
+                      right: 0.0,
+                      bottom: 0.0,
+                      child: new Icon(Icons.star),
+                    ),
+              ],
+            )
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+            );
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      )
     );
   }
 
-  Widget _buildBody() {
-    return new Container(
-        constraints: new BoxConstraints.expand(
-          height: 200.0,
-        ),
-        padding: new EdgeInsets.only(left: 16.0, bottom: 8.0, right: 16.0),
-        decoration: new BoxDecoration(
-          image: new DecorationImage(
-            image: new AssetImage('assets/image.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: new Stack(
-          children: <Widget>[
-            new Positioned(
-              left: 0.0,
-              bottom: 0.0,
-              child: new Text('Title',
-                  style: new TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
-                  )
-              ),
-            ),
-            new Positioned(
-              right: 0.0,
-              bottom: 0.0,
-              child: new Icon(Icons.star),
-            ),
-          ],
-        )
+  pressButton(int index) {
+    print("Index number is: $index");
+    if(index == 0) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PlayScreen(sound: "forest"))
+      );
+    }
+    else if(index == 1 ){
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PlayScreen(sound: "rain"))
+      );
+    }
+    else if(index == 2 ){
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PlayScreen(sound: "sunset"))
+      );
+    }
+  }
+}
+
+class PlayScreen extends StatefulWidget {
+  final String sound;
+  const PlayScreen({Key key, this.sound}) : super(key: key);
+  @override
+  _PlayRouteState createState() => _PlayRouteState();
+}
+
+class _PlayRouteState extends State<PlayScreen> {
+  AudioPlayer player;
+  AudioCache cache;
+  bool initialPlay = true;
+  bool playing;
+
+  @override
+  initState() {
+    super.initState();
+    player = new AudioPlayer();
+    cache = new AudioCache(fixedPlayer: player);
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    player.stop();
+  }
+
+  playPause(sound) {
+    if (initialPlay) {
+      cache.play('audio/$sound.mp3');
+      playing = true;
+      initialPlay = false;
+    }
+    return IconButton(
+      color: Colors.white70, iconSize: 80.0, icon: playing ? Icon(Icons.pause_circle_filled) : Icon(Icons.play_circle_filled),
+      onPressed: () {
+        setState(() {
+          if (playing) {
+            playing = false;
+            player.pause();
+          } else {
+            playing = true;
+            player.resume();
+          }
+        });
+      },
     );
+  }
+
+  @override
+  build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned(top: 0, left: 0, child: Background(sound: widget.sound)),
+          Positioned(top: 0, left: 0, right: 0, child: AppBar(backgroundColor: Colors.transparent, elevation: 0)),
+          Padding(padding: const EdgeInsets.only(top: 180.0),
+              child: Center(
+                  child: Column(children: [Text(widget.sound.toUpperCase()), playPause(widget.sound)])
+              )
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Background extends StatefulWidget {
+  final String sound;
+  const Background({Key key, this.sound}) : super(key: key);
+  @override
+  _BackgroundState createState() => _BackgroundState();
+}
+
+class _BackgroundState extends State<Background> {
+  Timer timer;
+  bool _visible = false;
+
+  @override
+  dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  swap() {
+    if (mounted) {
+      setState(() { _visible = !_visible;
+      });
+    }
+  }
+
+  @override
+  build(BuildContext context) {
+    timer = Timer(Duration(seconds: 6), swap);
+    return Stack(
+      children: [
+        Image.asset("assets/images/leaves.jpg", fit: BoxFit.cover,),
+        AnimatedOpacity(
+            child: Image.asset("assets/images/rain.jpg",fit: BoxFit.cover,),
+            duration: Duration(seconds: 2),
+            opacity: _visible ? 1.0 : 0.0)
+      ],
+    );
+  }
 }
