@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -53,11 +55,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   List<String> assertImage = new List<String>();
   List<String> soundType = new List<String>();
 
-  
   @override
   Widget build(BuildContext context) {
     assertImage.add('assets/images/leaves.jpg');
@@ -73,77 +73,75 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: GridView.count(
-        primary: false,
-        padding: const EdgeInsets.all(20),
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        crossAxisCount: 2,
-        children: List.generate(3 , (index) {
-          return new GestureDetector(
-            onTap : (){ pressButton(index); },
-            child: Container(
-              constraints: new BoxConstraints.expand(
-                height: 200.0,
-              ),
-              padding: new EdgeInsets.only(left: 16.0, bottom: 8.0, right: 16.0),
-              decoration: new BoxDecoration(
-                image: new DecorationImage(
-                  image: new AssetImage(assertImage[index]),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            child: new Stack(
-              children: <Widget>[
-                new Positioned(
-                  left: 0.0,
-                  bottom: 0.0,
-                  child: new Text(soundType[index],
-                    style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 20.0,
-                    )
-                    ),
-                    ),
-                    new Positioned(
-                      right: 0.0,
-                      bottom: 0.0,
-                      child: new Icon(Icons.star),
-                    ),
-              ],
-            )
-            ),
-            );
-          },
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(widget.title),
         ),
-      )
-    );
+        body: GridView.count(
+          primary: false,
+          padding: const EdgeInsets.all(20),
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          crossAxisCount: 2,
+          children: List.generate(
+            3,
+            (index) {
+              return new GestureDetector(
+                onTap: () {
+                  pressButton(index);
+                },
+                child: Container(
+                  constraints: new BoxConstraints.expand(
+                    height: 200.0,
+                  ),
+                  padding:
+                      new EdgeInsets.only(left: 1.0, bottom: 0.0, right: 1.0),
+                  decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                      image: new AssetImage(assertImage[index]),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: new Icon(Icons.star),
+                      ),
+                      Container(
+                          height: 35,
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          color: Colors.black87,
+                          child: new Text(soundType[index],
+                              textAlign: TextAlign.center,
+                              style: new TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 20.0,
+                              ))),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ));
   }
 
   pressButton(int index) {
     print("Index number is: $index");
-    if(index == 0) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PlayScreen(sound: "forest"))
-      );
-    }
-    else if(index == 1 ){
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PlayScreen(sound: "rain"))
-      );
-    }
-    else if(index == 2 ){
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PlayScreen(sound: "sunset"))
-      );
+    if (index == 0) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => PlayScreen(sound: "forest")));
+    } else if (index == 1) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => PlayScreen(sound: "rain")));
+    } else if (index == 2) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => PlayScreen(sound: "sunset")));
     }
   }
 }
@@ -181,7 +179,11 @@ class _PlayRouteState extends State<PlayScreen> {
       initialPlay = false;
     }
     return IconButton(
-      color: Colors.white70, iconSize: 80.0, icon: playing ? Icon(Icons.pause_circle_filled) : Icon(Icons.play_circle_filled),
+      color: Colors.white70,
+      iconSize: 80.0,
+      icon: playing
+          ? Icon(Icons.pause_circle_filled)
+          : Icon(Icons.play_circle_filled),
       onPressed: () {
         setState(() {
           if (playing) {
@@ -202,12 +204,18 @@ class _PlayRouteState extends State<PlayScreen> {
       body: Stack(
         children: [
           Positioned(top: 0, left: 0, child: Background(sound: widget.sound)),
-          Positioned(top: 0, left: 0, right: 0, child: AppBar(backgroundColor: Colors.transparent, elevation: 0)),
-          Padding(padding: const EdgeInsets.only(top: 180.0),
+          Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: AppBar(backgroundColor: Colors.transparent, elevation: 0)),
+          Padding(
+              padding: const EdgeInsets.only(top: 180.0),
               child: Center(
-                  child: Column(children: [Text(widget.sound.toUpperCase()), playPause(widget.sound)])
-              )
-          ),
+                  child: Column(children: [
+                Text(widget.sound.toUpperCase()),
+                playPause(widget.sound)
+              ]))),
         ],
       ),
     );
@@ -233,7 +241,8 @@ class _BackgroundState extends State<Background> {
 
   swap() {
     if (mounted) {
-      setState(() { _visible = !_visible;
+      setState(() {
+        _visible = !_visible;
       });
     }
   }
@@ -243,9 +252,15 @@ class _BackgroundState extends State<Background> {
     timer = Timer(Duration(seconds: 6), swap);
     return Stack(
       children: [
-        Image.asset("assets/images/leaves.jpg", fit: BoxFit.cover,),
+        Image.asset(
+          "assets/images/leaves.jpg",
+          fit: BoxFit.fill,
+        ),
         AnimatedOpacity(
-            child: Image.asset("assets/images/rain.jpg",fit: BoxFit.cover,),
+            child: Image.asset(
+              "assets/images/rain.jpg",
+              fit: BoxFit.fill,
+            ),
             duration: Duration(seconds: 2),
             opacity: _visible ? 1.0 : 0.0)
       ],
