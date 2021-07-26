@@ -203,7 +203,13 @@ class _PlayRouteState extends State<PlayScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(top: 0, left: 0, child: Background(sound: widget.sound)),
+          Positioned.fill(
+            child: Background(sound: widget.sound),
+            bottom: 0,
+            left: 0,
+            top: 0,
+            right: 0,
+          ),
           Positioned(
               top: 0,
               left: 0,
@@ -213,7 +219,10 @@ class _PlayRouteState extends State<PlayScreen> {
               padding: const EdgeInsets.only(top: 180.0),
               child: Center(
                   child: Column(children: [
-                Text(widget.sound.toUpperCase()),
+                Text(
+                  widget.sound.toUpperCase(),
+                  style: new TextStyle(color: Colors.white, fontSize: 30),
+                ),
                 playPause(widget.sound)
               ]))),
         ],
@@ -252,14 +261,22 @@ class _BackgroundState extends State<Background> {
     timer = Timer(Duration(seconds: 6), swap);
     return Stack(
       children: [
-        Image.asset(
-          "assets/images/leaves.jpg",
-          fit: BoxFit.fill,
+        new Container(
+          decoration: new BoxDecoration(
+            image: new DecorationImage(
+              image: new AssetImage("assets/images/leaves.jpg"),
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
         AnimatedOpacity(
-            child: Image.asset(
-              "assets/images/rain.jpg",
-              fit: BoxFit.fill,
+            child: new Container(
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  image: new AssetImage("assets/images/rain.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             duration: Duration(seconds: 2),
             opacity: _visible ? 1.0 : 0.0)
